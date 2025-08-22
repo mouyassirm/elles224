@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { formatCurrency } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, DollarSign, TrendingUp, AlertTriangle } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts'
@@ -110,12 +111,7 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {stock_summary.total_value.toLocaleString('fr-FR', {
-                style: 'currency',
-                currency: 'EUR'
-              })}
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(stock_summary.total_value)}</div>
             <p className="text-xs text-muted-foreground">
               Valeur totale
             </p>
@@ -128,12 +124,7 @@ export default function Dashboard() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {financial_summary.total_revenue.toLocaleString('fr-FR', {
-                style: 'currency',
-                currency: 'EUR'
-              })}
-            </div>
+            <div className="text-2xl font-bold">{formatCurrency(financial_summary.total_revenue)}</div>
             <p className="text-xs text-muted-foreground">
               Total des ventes
             </p>

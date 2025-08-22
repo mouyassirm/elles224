@@ -1,4 +1,5 @@
 import React from 'react'
+import { formatCurrency } from '@/lib/utils'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { DollarSign, TrendingUp, BarChart3, Calendar } from 'lucide-react'
 
