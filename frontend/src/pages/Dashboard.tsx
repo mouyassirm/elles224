@@ -250,3 +250,264 @@ export default function Dashboard() {
 }
 
 
+
+
+                style: 'currency',
+
+                currency: 'EUR'
+
+              })}
+
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+
+              Total des ventes
+
+            </p>
+
+          </CardContent>
+
+        </Card>
+
+
+
+        <Card>
+
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+
+            <CardTitle className="text-sm font-medium">Stock Faible</CardTitle>
+
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+
+          </CardHeader>
+
+          <CardContent>
+
+            <div className="text-2xl font-bold text-orange-600">
+
+              {stock_summary.low_stock_items}
+
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+
+              Articles à réapprovisionner
+
+            </p>
+
+          </CardContent>
+
+        </Card>
+
+      </div>
+
+
+
+      {/* Charts */}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+        <Card>
+
+          <CardHeader>
+
+            <CardTitle>Évolution des ventes</CardTitle>
+
+            <CardDescription>
+
+              Chiffre d'affaires mensuel
+
+            </CardDescription>
+
+          </CardHeader>
+
+          <CardContent>
+
+            <ResponsiveContainer width="100%" height={300}>
+
+              <LineChart data={monthlyData}>
+
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="month" />
+
+                <YAxis />
+
+                <Tooltip 
+
+                  formatter={(value) => [
+
+                    `${value.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}`,
+
+                    'Revenus'
+
+                  ]}
+
+                />
+
+                <Line 
+
+                  type="monotone" 
+
+                  dataKey="revenue" 
+
+                  stroke="#3b82f6" 
+
+                  strokeWidth={2}
+
+                  dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+
+                />
+
+              </LineChart>
+
+            </ResponsiveContainer>
+
+          </CardContent>
+
+        </Card>
+
+
+
+        <Card>
+
+          <CardHeader>
+
+            <CardTitle>Volume des ventes</CardTitle>
+
+            <CardDescription>
+
+              Nombre de ventes par mois
+
+            </CardDescription>
+
+          </CardHeader>
+
+          <CardContent>
+
+            <ResponsiveContainer width="100%" height={300}>
+
+              <BarChart data={monthlyData}>
+
+                <CartesianGrid strokeDasharray="3 3" />
+
+                <XAxis dataKey="month" />
+
+                <YAxis />
+
+                <Tooltip />
+
+                <Bar dataKey="sales" fill="#10b981" />
+
+              </BarChart>
+
+            </ResponsiveContainer>
+
+          </CardContent>
+
+        </Card>
+
+      </div>
+
+
+
+      {/* Additional Info */}
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+
+        <Card>
+
+          <CardHeader>
+
+            <CardTitle>Informations financières</CardTitle>
+
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+
+            <div className="flex justify-between">
+
+              <span className="text-sm text-gray-600">Total des ventes:</span>
+
+              <span className="font-medium">{financial_summary.total_sales}</span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span className="text-sm text-gray-600">Remise moyenne:</span>
+
+              <span className="font-medium">{financial_summary.average_discount.toFixed(1)}%</span>
+
+            </div>
+
+            <div className="flex justify-between">
+
+              <span className="text-sm text-gray-600">Meilleur vendeur:</span>
+
+              <span className="font-medium">
+
+                {financial_summary.best_selling_item || 'Aucun'}
+
+              </span>
+
+            </div>
+
+          </CardContent>
+
+        </Card>
+
+
+
+        <Card>
+
+          <CardHeader>
+
+            <CardTitle>Actions rapides</CardTitle>
+
+          </CardHeader>
+
+          <CardContent className="space-y-3">
+
+            <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+
+              <div className="font-medium">Ajouter un article</div>
+
+              <div className="text-sm text-gray-600">Créer un nouvel article en stock</div>
+
+            </button>
+
+            <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+
+              <div className="font-medium">Enregistrer une vente</div>
+
+              <div className="text-sm text-gray-600">Vendre des articles du stock</div>
+
+            </button>
+
+            <button className="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors">
+
+              <div className="font-medium">Voir les rapports</div>
+
+              <div className="text-sm text-gray-600">Analyser les performances</div>
+
+            </button>
+
+          </CardContent>
+
+        </Card>
+
+      </div>
+
+    </div>
+
+  )
+
+}
+
+
+
+
+
+

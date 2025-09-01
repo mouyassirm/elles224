@@ -89,6 +89,11 @@ async def create_purchase(
     db: Session = Depends(get_db)
 ):
     """Create a purchase movement (add stock)"""
+    # Validate stock exists
+    stock = StockService.get_stock(db, stock_id)
+    if not stock:
+        raise HTTPException(status_code=404, detail="Stock not found")
+    
     movement_data = MovementCreate(
         stock_id=stock_id,
         movement_type="purchase",
@@ -109,6 +114,18 @@ async def create_sale(
     db: Session = Depends(get_db)
 ):
     """Create a sale movement (remove stock)"""
+    # Validate stock exists
+    stock = StockService.get_stock(db, stock_id)
+    if not stock:
+        raise HTTPException(status_code=404, detail="Stock not found")
+    
+    # Check if enough stock is available
+    if stock.quantity < quantity:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Stock insuffisant. Disponible: {stock.quantity}, Demandé: {quantity}"
+        )
+    
     movement_data = MovementCreate(
         stock_id=stock_id,
         movement_type="sale",

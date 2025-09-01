@@ -32,13 +32,13 @@ export default function Movements() {
 
   // Purchase form state
   const [purchaseForm, setPurchaseForm] = useState({
-    stock_id: '',
+    stock_id: 0,
     quantity: 1
   })
 
   // Sale form state
   const [saleForm, setSaleForm] = useState({
-    stock_id: '',
+    stock_id: 0,
     quantity: 1,
     discount_percent: 0
   })
@@ -95,8 +95,9 @@ export default function Movements() {
       }
       
       // Reset form and refresh data
-      setPurchaseForm({ stock_id: '', quantity: 1 })
+      setPurchaseForm({ stock_id: 0, quantity: 1 })
       await Promise.all([fetchStocks(), fetchMovements()])
+      setError(null) // Clear any previous errors
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur inconnue')
     } finally {
@@ -107,6 +108,13 @@ export default function Movements() {
   const handleSale = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!saleForm.stock_id || saleForm.quantity <= 0) return
+
+    // Check stock availability before sending request
+    const selectedStock = stocks.find(s => s.id === saleForm.stock_id)
+    if (selectedStock && saleForm.quantity > selectedStock.quantity) {
+      setError(`Stock insuffisant. Disponible: ${selectedStock.quantity}, Demandé: ${saleForm.quantity}`)
+      return
+    }
 
     setIsSubmitting(true)
     setError(null)
@@ -120,8 +128,9 @@ export default function Movements() {
       }
       
       // Reset form and refresh data
-      setSaleForm({ stock_id: '', quantity: 1, discount_percent: 0 })
+      setSaleForm({ stock_id: 0, quantity: 1, discount_percent: 0 })
       await Promise.all([fetchStocks(), fetchMovements()])
+      setError(null) // Clear any previous errors
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erreur inconnue')
     } finally {
@@ -208,13 +217,13 @@ export default function Movements() {
                 <select 
                   required
                   value={purchaseForm.stock_id}
-                  onChange={(e) => setPurchaseForm(f => ({ ...f, stock_id: e.target.value }))}
+                  onChange={(e) => setPurchaseForm(f => ({ ...f, stock_id: Number(e.target.value) }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Sélectionner un article</option>
+                  <option value={0}>Sélectionner un article</option>
                   {stocks.map(stock => (
                     <option key={stock.id} value={stock.id}>
-                      {stock.reference} - {stock.name} (Stock: {stock.quantity})
+                      {stock.reference} - {stock.name} (Stock actuel: {stock.quantity})
                     </option>
                   ))}
                 </select>
@@ -232,11 +241,16 @@ export default function Movements() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Quantité à ajouter"
                 />
+                {purchaseForm.stock_id > 0 && (
+                  <p className="mt-1 text-sm text-gray-600">
+                    Nouveau stock après achat: {(getStockById(purchaseForm.stock_id)?.quantity || 0) + purchaseForm.quantity}
+                  </p>
+                )}
               </div>
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isSubmitting || !purchaseForm.stock_id}
+                disabled={isSubmitting || purchaseForm.stock_id === 0}
               >
                 <TrendingUp className="h-4 w-4 mr-2" />
                 {isSubmitting ? 'Enregistrement...' : 'Enregistrer l\'achat'}
@@ -261,13 +275,13 @@ export default function Movements() {
                 <select 
                   required
                   value={saleForm.stock_id}
-                  onChange={(e) => setSaleForm(f => ({ ...f, stock_id: e.target.value }))}
+                  onChange={(e) => setSaleForm(f => ({ ...f, stock_id: Number(e.target.value) }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Sélectionner un article</option>
+                  <option value={0}>Sélectionner un article</option>
                   {stocks.filter(s => s.quantity > 0).map(stock => (
                     <option key={stock.id} value={stock.id}>
-                      {stock.reference} - {stock.name} (Stock: {stock.quantity})
+                      {stock.reference} - {stock.name} (Stock disponible: {stock.quantity})
                     </option>
                   ))}
                 </select>
@@ -280,11 +294,17 @@ export default function Movements() {
                   required
                   type="number"
                   min="1"
+                  max={saleForm.stock_id > 0 ? getStockById(saleForm.stock_id)?.quantity || 0 : undefined}
                   value={saleForm.quantity}
                   onChange={(e) => setSaleForm(f => ({ ...f, quantity: Number(e.target.value) }))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Quantité à vendre"
                 />
+                {saleForm.stock_id > 0 && (
+                  <p className="mt-1 text-sm text-gray-600">
+                    Stock restant après vente: {Math.max(0, (getStockById(saleForm.stock_id)?.quantity || 0) - saleForm.quantity)}
+                  </p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -304,7 +324,7 @@ export default function Movements() {
               <Button 
                 type="submit" 
                 className="w-full" 
-                disabled={isSubmitting || !saleForm.stock_id}
+                disabled={isSubmitting || saleForm.stock_id === 0}
               >
                 <TrendingDown className="h-4 w-4 mr-2" />
                 {isSubmitting ? 'Enregistrement...' : 'Enregistrer la vente'}
@@ -378,5 +398,196 @@ export default function Movements() {
     </div>
   )
 }
+
+
+
+
+            </div>
+
+            <Button className="w-full">
+
+              <TrendingUp className="h-4 w-4 mr-2" />
+
+              Enregistrer l'achat
+
+            </Button>
+
+          </CardContent>
+
+        </Card>
+
+
+
+        <Card>
+
+          <CardHeader>
+
+            <CardTitle>Enregistrer une vente</CardTitle>
+
+            <CardDescription>
+
+              Vendre des articles du stock
+
+            </CardDescription>
+
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+
+            <div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+
+                Article
+
+              </label>
+
+              <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                <option value="">Sélectionner un article</option>
+
+              </select>
+
+            </div>
+
+            <div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+
+                Quantité
+
+              </label>
+
+              <input
+
+                type="number"
+
+                min="1"
+
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                placeholder="Quantité à vendre"
+
+              />
+
+            </div>
+
+            <div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+
+                Remise (%)
+
+              </label>
+
+              <input
+
+                type="number"
+
+                min="0"
+
+                max="100"
+
+                step="0.1"
+
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+                placeholder="0"
+
+              />
+
+            </div>
+
+            <Button className="w-full">
+
+              <TrendingDown className="h-4 w-4 mr-2" />
+
+              Enregistrer la vente
+
+            </Button>
+
+          </CardContent>
+
+        </Card>
+
+      </div>
+
+
+
+      {/* Recent Movements */}
+
+      <Card>
+
+        <CardHeader>
+
+          <CardTitle>Mouvements récents</CardTitle>
+
+          <CardDescription>
+
+            Historique des derniers mouvements de stock
+
+          </CardDescription>
+
+        </CardHeader>
+
+        <CardContent>
+
+          <div className="overflow-x-auto">
+
+            <table className="w-full">
+
+              <thead>
+
+                <tr className="border-b">
+
+                  <th className="text-left py-3 px-4 font-medium">Date</th>
+
+                  <th className="text-left py-3 px-4 font-medium">Article</th>
+
+                  <th className="text-left py-3 px-4 font-medium">Type</th>
+
+                  <th className="text-left py-3 px-4 font-medium">Quantité</th>
+
+                  <th className="text-left py-3 px-4 font-medium">Remise</th>
+
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+                <tr className="border-b">
+
+                  <td className="py-4 px-4 text-gray-500">Aucun mouvement</td>
+
+                  <td className="py-4 px-4 text-gray-500">-</td>
+
+                  <td className="py-4 px-4 text-gray-500">-</td>
+
+                  <td className="py-4 px-4 text-gray-500">-</td>
+
+                  <td className="py-4 px-4 text-gray-500">-</td>
+
+                </tr>
+
+              </tbody>
+
+            </table>
+
+          </div>
+
+        </CardContent>
+
+      </Card>
+
+    </div>
+
+  )
+
+}
+
+
+
+
 
 
