@@ -8,6 +8,7 @@ from contextlib import asynccontextmanager
 
 from database import engine, Base
 from routers import stock, movements, finance, reports
+import auth_router
 from config import settings
 
 # Create database tables
@@ -37,6 +38,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth_router.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(stock.router, prefix="/api/stock", tags=["Stock"])
 app.include_router(movements.router, prefix="/api/movements", tags=["Movements"])
 app.include_router(finance.router, prefix="/api/finance", tags=["Finance"])

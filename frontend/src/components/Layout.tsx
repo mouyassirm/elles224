@@ -1,16 +1,19 @@
 import React from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { 
   LayoutDashboard, 
   Package, 
-  Move, 
+  Move,
   DollarSign, 
   BarChart3,
   Menu,
-  X
+  X,
+  LogOut,
+  User
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -26,7 +29,26 @@ const navigation = [
 
 export default function Layout({ children }: LayoutProps) {
   const location = useLocation()
+  const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, logout, isCEO } = useAuth()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
+
+  // Filter navigation based on user role
+  const getNavigation = () => {
+    if (isCEO) {
+      return navigation // CEO sees all pages
+    } else {
+      // Manager only sees Stock and Movements
+      return navigation.filter(item => 
+        ['Stock', 'Mouvements'].includes(item.name)
+      )
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -45,7 +67,7 @@ export default function Layout({ children }: LayoutProps) {
             </Button>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
+            {getNavigation().map((item) => {
               const isActive = location.pathname === item.href
               return (
                 <Link
@@ -64,6 +86,26 @@ export default function Layout({ children }: LayoutProps) {
               )
             })}
           </nav>
+          
+          {/* User info and logout */}
+          <div className="border-t border-gray-200 p-4">
+            <div className="flex items-center mb-3">
+              <User className="h-5 w-5 text-gray-400 mr-2" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="w-full"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Déconnexion
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -74,7 +116,7 @@ export default function Layout({ children }: LayoutProps) {
             <h1 className="text-xl font-bold text-gray-900">ELLES 224 by HikIrfane</h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {navigation.map((item) => {
+            {getNavigation().map((item) => {
               const isActive = location.pathname === item.href
               return (
                 <Link
@@ -92,6 +134,26 @@ export default function Layout({ children }: LayoutProps) {
               )
             })}
           </nav>
+          
+          {/* User info and logout */}
+          <div className="border-t border-gray-200 p-4">
+            <div className="flex items-center mb-3">
+              <User className="h-5 w-5 text-gray-400 mr-2" />
+              <div>
+                <p className="text-sm font-medium text-gray-900">{user?.username}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="w-full"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Déconnexion
+            </Button>
+          </div>
         </div>
       </div>
 

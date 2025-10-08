@@ -298,7 +298,7 @@ export default function Finance() {
                   </tr>
                 )}
                 {!loading && getSalesForTable().length === 0 && (
-                  <tr className="border-b">
+                <tr className="border-b">
                     <td className="py-4 px-4 text-gray-500" colSpan={7}>Aucune vente sur cette période</td>
                   </tr>
                 )}
@@ -321,7 +321,7 @@ export default function Finance() {
                       </td>
                       <td className="py-3 px-4">{formatCurrency(priceAfterDiscount)}</td>
                       <td className="py-3 px-4 font-medium">{formatCurrency(total)}</td>
-                    </tr>
+                </tr>
                   )
                 })}
               </tbody>
@@ -341,9 +341,9 @@ export default function Finance() {
         <CardContent>
           <div className="space-y-4">
             {getBestSellers().length === 0 ? (
-              <div className="text-center text-gray-500 py-8">
-                Aucune donnée de vente disponible
-              </div>
+            <div className="text-center text-gray-500 py-8">
+              Aucune donnée de vente disponible
+            </div>
             ) : (
               getBestSellers().map((item, index) => (
                 <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
