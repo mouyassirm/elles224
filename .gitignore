@@ -21,7 +21,7 @@ wheels/
 *.egg
 MANIFEST
 
-# Virtual Environment
+# Virtual environments
 .venv/
 venv/
 ENV/
@@ -40,8 +40,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Vite
-dist/
 .vite/
+dist/
 
 # IDE
 .vscode/
@@ -55,6 +55,7 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
 
 # Temporary files
 *.tmp
