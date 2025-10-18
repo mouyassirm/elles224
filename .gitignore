@@ -42,6 +42,7 @@ yarn-error.log*
 # Vite
 .vite/
 dist/
+frontend/node_modules/.vite/
 
 # IDE
 .vscode/
@@ -60,3 +61,4 @@ logs/
 # Temporary files
 *.tmp
 *.temp
+
